@@ -135,12 +135,12 @@
     width: 20px;
     height: 20px;
     border: 3px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: white;
-    animation: spin 1s ease-in-out infinite;
-    margin-right: 8px;
+    border-radius:50%;
+    border-top-color:white;
+    animation:spin 1s ease-in-out infinite;
+    margin-right:8px;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes spin { to { transform:rotate(360deg); } }
   @media(max-width:575px){
     .form-grid{grid-template-columns:1fr}
     .bill-box{padding:24px 20px}
@@ -153,7 +153,7 @@
 <div class="container">
 <div class="bill-box">
   <div class="logo">
-    <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/7aa4d360a0d64c3a9f6d6d7d566254be.png~tplv-a9rns2rl98-24:720:720.png?lk3s=8e244e95&rcl=20260330174509DC45CD7E3E12CCB78D76&rrcfp=8a172a1a&x-expires=1775468709&x-signature=3fg%2FtEvQrIRt6q4p6HO46nfHlSw%3D" alt="LONGi Solar Logo" onerror="this.src='https://via.placeholder.com/300x100?text=LONGi+Solar';">
+    <img src="./longi-logo.png" alt="LONGi Solar Logo" onerror="this.src='https://via.placeholder.com/300x100?text=LONGi+Solar';">
   </div>
   <div class="bill-title">Check Your Module Dust Bill</div>
   <div class="bill-subtitle">Calculation Results are for preliminary reference only.</div>
@@ -236,16 +236,16 @@
       <input type="number" class="form-input" id="cleanTimes" value="4" min="0">
     </div>
     <div class="form-item">
-      <label class="form-label">Cost per Cleaning (THB)</label>
-      <input type="number" class="form-input" id="cleanCost" value="5000" min="0">
+      <label class="form-label">Cost per Cleaning (USD)</label>
+      <input type="number" class="form-input" id="cleanCost" value="150" min="0">
     </div>
     <div class="form-item">
       <label class="form-label">Dusty Days/Year (1-365)</label>
       <input type="number" class="form-input" id="dustyDays" value="50" min="1" max="365">
     </div>
     <div class="form-item">
-      <label class="form-label">Electricity Price (THB/kWh)</label>
-      <input type="number" class="form-input" id="price" value="5" min="0" step="0.01">
+      <label class="form-label">Electricity Price (USD/kWh)</label>
+      <input type="number" class="form-input" id="price" value="0.15" min="0" step="0.001">
     </div>
   </div>
   <button class="calc-btn" onclick="calculateBill()" id="calcBtn">CHECK DUST BILL</button>
@@ -339,12 +339,13 @@ window.onload = function(){
     console.log('Initialization data:', e);
   }
 }
-function fmtTHB(v){
-  try {
-    return v.toLocaleString('th-TH', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' THB';
-  } catch {
-    return v.toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2}) + ' THB';
-  }
+function fmtUSD(v){
+  return v.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
 function getTotalLossRate(H, PM, VEG, tilt, dusty){
   let hLoss = 0;
@@ -385,7 +386,7 @@ function calculateBill(){
     const PM      = Number(document.getElementById('pm10').value) || 0;
     const VEG     = Number(document.getElementById('vegetation').value) || 0;
     if(area <= 0) throw new Error('Roof area must be greater than 0 m²');
-    if(price <= 0) throw new Error('Electricity price must be greater than 0 THB/kWh');
+    if(price <= 0) throw new Error('Electricity price must be greater than 0 USD/kWh');
     const totalClean = cleanT * cleanC;
     const lossRate = getTotalLossRate(H,PM,VEG,tilt,dusty);
     const lossText = (lossRate*100).toFixed(2)+'%';
@@ -394,9 +395,9 @@ function calculateBill(){
     const powerLoss = annualGen * lossRate * price;
     const total = totalClean + powerLoss;
     document.getElementById('lossRateText').innerText = lossText;
-    document.getElementById('cleanTotal').innerText  = fmtTHB(totalClean);
-    document.getElementById('powerLoss').innerText   = fmtTHB(powerLoss);
-    document.getElementById('totalBill').innerText   = fmtTHB(total);
+    document.getElementById('cleanTotal').innerText  = fmtUSD(totalClean);
+    document.getElementById('powerLoss').innerText   = fmtUSD(powerLoss);
+    document.getElementById('totalBill').innerText   = fmtUSD(total);
     const bill = document.getElementById('resultBill');
     const stamp = document.getElementById('stamp');
     bill.style.display = 'block';
